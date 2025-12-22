@@ -26,17 +26,3 @@ def getEditors() -> list[models.Editor]:
     # TODO: implement function
 
     return editor_list
-
-
-def getStocks() -> list[models.Stock]:
-    """
-    Method to/that # TODO: set docstring
-
-    Raises:
-        # TODO: set exceptions
-    """
-    stock_list: list[models.Stock] = []
-
-    # TODO: implement function
-
-    return stock_list

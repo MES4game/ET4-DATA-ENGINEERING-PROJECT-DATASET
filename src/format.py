@@ -17,7 +17,6 @@ def formatData(
         games: list[models.Game],
         notes: list[models.Note],
         editors: list[models.Editor],
-        stocks: list[models.Stock],
         /
         ) -> list[models.Data]:
     """
