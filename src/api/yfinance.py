@@ -1,28 +1,64 @@
 """
 yfinance API module
 ===================
-Package: `src`
+Package: `api`
 
-Module to/that # TODO: set docstring
+Retrieves financial data for game publishers using yfinance.
 
 Functions
 ---------
-- `getEditors`
-- `getStocks`
+- `getPublishers`
 """
 
-from . import models
+
+import datetime
+import yfinance as yf
+from . import echo, models
 
 
-def getEditors() -> list[models.Editor]:
+def getPublishers(
+        *,
+        publishers_ids: list[models.PublisherId],
+        ) -> list[models.Publisher]:
     """
-    Method to/that # TODO: set docstring
+    Retrieves financial data and stock history for tracked publishers.
 
-    Raises:
-        # TODO: set exceptions
+    Parameters:
+        publishers_ids (list[models.PublisherId]): List of publisher identities to fetch
+
+    Returns:
+        out (list[models.Publisher]): List of publishers with financial data
     """
-    editor_list: list[models.Editor] = []
+    publisher_list: list[models.Publisher] = []
 
-    # TODO: implement function
+    echo.echoInfo(f"--- Début de l'extraction Yahoo finance pour {len(publishers_ids)} éditeurs ---", indent=1)
 
-    return editor_list
+    for publisher in publishers_ids:
+        echo.echoInfo(f"Récupération des données pour \"{publisher.name}\" ({publisher.symbol})...", indent=2)
+
+        try:
+            ticker = yf.Ticker(publisher.symbol)
+
+            history_dict: dict[datetime.date, models.StockValue] = {
+                date.date(): models.StockValue(
+                    close_price=float(row['Close']),
+                    volume=int(row['Volume']),
+                )
+                for date, row in ticker.history(period="max").iterrows()
+            }
+
+            publisher_list.append(models.Publisher(
+                used_name=publisher.name,
+                symbol=str(ticker.info.get('symbol', publisher.symbol) or publisher.symbol),
+                short_name=str(ticker.info.get('shortName', publisher.name) or publisher.name),
+                long_name=str(ticker.info.get('longName', publisher.name) or publisher.name),
+                currency=str(ticker.info.get('currency', 'USD') or 'USD'),
+                history=history_dict,
+            ))
+
+        except Exception:
+            echo.echoError(f"Erreur lors de la récupération des données pour \"{publisher.name}\" ({publisher.symbol})", indent=2)
+
+    echo.echoInfo("--- Fin de la récupération des éditeurs sur Yahoo finance ---", indent=1)
+
+    return publisher_list

@@ -3,7 +3,7 @@ game module
 ===========
 Package: `models`
 
-Module to/that # TODO: set docstring
+Module to define a video game.
 
 Classes
 -------
@@ -19,50 +19,57 @@ class Game:
     """
     Game class
     ==========
-    Class to/that # TODO: set docstring
+    Defines a video game.
 
     Attributes:
-        # TODO: set attributes
+        name (str): Name of the game
+        price (int): Price of the game in currency cents (e.g., 1999 = 19.99 currency)
+        currency (str): Currency code (e.g., "USD")
+        publisher (str): Publisher of the game
+        for_windows (bool): Whether the game is available for Windows
+        for_mac (bool): Whether the game is available for Mac
+        for_linux (bool): Whether the game is available for Linux
+        genres (list[str]): Genres of the game
+        release_date (datetime.date): Release date of the game
+        data_source (str): Source URL of the game data
     """
     def __init__(
             self: typing.Self,
             /,
             *,
-            name: str = "",
-            price: int = 0,
-            required_age: int = 0,
-            publisher: str = "",
-            for_windows: bool = False,
-            for_mac: bool = False,
-            for_linux: bool = False,
-            genres: list[str] = [],
-            release_date: datetime.date = datetime.date.today()
+            name: str,
+            price: int,
+            currency: str,
+            publisher: str,
+            for_windows: bool,
+            for_mac: bool,
+            for_linux: bool,
+            genres: list[str],
+            release_date: datetime.date,
+            data_source: str,
             ) -> None:
         """
-        Method to/that # TODO: set docstring
+        Initializes a Game instance.
 
-        Raises:
-            # TODO: set exceptions
+        Parameters:
+            name (str): Name of the game
+            price (int): Price of the game in currency cents (e.g., 1999 = 19.99 currency)
+            currency (str): Currency code (e.g., "USD")
+            publisher (str): Publisher of the game
+            for_windows (bool): Whether the game is available for Windows
+            for_mac (bool): Whether the game is available for Mac
+            for_linux (bool): Whether the game is available for Linux
+            genres (list[str]): Genres of the game
+            release_date (datetime.date): Release date of the game
+            data_source (str): Source URL of the game data
         """
-        # Name of the game
         self.name: str = name
-
-        # Price of the game in USD cents (e.g., 1999 = $19.99)
         self.price: int = price
-
-        # Required age (in year) to play the game
-        self.required_age: int = required_age
-
-        # Publisher of the game
+        self.currency: str = currency
         self.publisher: str = publisher
-
-        # Supported platforms
         self.for_windows: bool = for_windows
         self.for_mac: bool = for_mac
         self.for_linux: bool = for_linux
-
-        # Genres of the game
         self.genres: list[str] = genres
-
-        # Release date of the game
         self.release_date: datetime.date = release_date
+        self.data_source: str = data_source

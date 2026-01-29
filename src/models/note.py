@@ -3,7 +3,7 @@ note module
 ===========
 Package: `models`
 
-Module to/that # TODO: set docstring
+Module to define a video game note/rating.
 
 Classes
 -------
@@ -19,38 +19,45 @@ class Note:
     """
     Note class
     ==========
-    Class to/that # TODO: set docstring
+    Defines a video game note/rating.
 
     Attributes:
-        # TODO: set attributes
+        name (str): Name of the game
+        publisher (str): Name of the publisher
+        release_date (datetime.date): Release date of the game
+        metacritic (int): Metacritic score (0-100)
+        rating (float): User rating (0.0-5.0)
+        ratings_count (int): Number of user ratings
+        data_source (str): Source URL of the note data
     """
     def __init__(
             self: typing.Self,
             /,
             *,
-            name: str = "",
-            name_original: str = "",
-            alternative_names: list[str] = [],
-            release_date: datetime.date = datetime.date.today(),
-            metacritic: int = 0,
-            rating: float = 0.0,
-            ratings_count: int = 0
+            name: str,
+            publisher: str,
+            release_date: datetime.date,
+            metacritic: int,
+            rating: float,
+            ratings_count: int,
+            data_source: str,
             ) -> None:
         """
-        Method to/that # TODO: set docstring
+        Initializes a Note instance.
 
-        Raises:
-            # TODO: set exceptions
+        Parameters:
+            name (str): Name of the game
+            publisher (str): Name of the publisher
+            release_date (datetime.date): Release date of the game
+            metacritic (int): Metacritic score (0-100)
+            rating (float): User rating (0.0-5.0)
+            ratings_count (int): Number of user ratings
+            data_source (str): Source URL of the note data
         """
-        # Game info
         self.name: str = name
-        self.name_original: str = name_original
-        self.alternative_names: list[str] = alternative_names
+        self.publisher: str = publisher
         self.release_date: datetime.date = release_date
-
-        # Metacritic score (0-100)
         self.metacritic: int = metacritic
-
-        # User rating (0.0-5.0) and number of ratings
         self.rating: float = rating
         self.ratings_count: int = ratings_count
+        self.data_source: str = data_source

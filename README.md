@@ -25,6 +25,7 @@ Le but de ce projet est de créer un nouveau dataset à partir de datasets exist
   4. run `pip install -r requirements.txt` to install the dependencies
 
 - ### Running
+  0. create a file named `.env` in the root directory of the project, and add environment variale `RAWG_API_KEY`
   1. run `python3 main.py` to launch the application
   2. follow the instructions in the terminal to use the application
 
