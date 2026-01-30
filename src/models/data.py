@@ -102,12 +102,22 @@ class Data:
         release_stock_value = self.publisher.history[release_date]
         current_time: str = datetime.datetime.now().isoformat()
 
+        try:
+            price_variation = round((target_stock_value.close_price - release_stock_value.close_price) * 100 / release_stock_value.close_price, 2)
+        except ZeroDivisionError:
+            price_variation = None
+
+        try:
+            volume_variation = round((target_stock_value.volume - release_stock_value.volume) * 100 / release_stock_value.volume, 2)
+        except ZeroDivisionError:
+            volume_variation = None
+
         return {
             "date": target_date.isoformat(),
             "close_price": target_stock_value.close_price,
             "volume": target_stock_value.volume,
-            "price_variation_percentage": round((target_stock_value.close_price - release_stock_value.close_price) * 100 / release_stock_value.close_price, 2),
-            "volume_variation_percentage": round((target_stock_value.volume - release_stock_value.volume) * 100 / release_stock_value.volume, 2),
+            "price_variation_percentage": price_variation,
+            "volume_variation_percentage": volume_variation,
             "data_source": "yfinance python package (https://finance.yahoo.com/)",
             "last_updated": current_time,
             "ingestion_date": current_time,
