@@ -16,7 +16,7 @@ import time
 import datetime
 import re
 import requests
-from . import echo, models
+from . import utils, models
 
 
 def getNotes(
@@ -47,10 +47,10 @@ def getNotes(
         "publishers": ",".join(map(lambda x: x.rawg_name, publishers_ids)),
     }
 
-    echo.echoInfo(f"--- Début de l'extraction RAWG.io pour {len(publishers_ids)} éditeurs ---", indent=1)
+    utils.echoInfo(f"--- Début de l'extraction RAWG.io pour {len(publishers_ids)} éditeurs ---", indent=1)
 
     for publisher in publishers_ids:
-        echo.echoInfo(f"Récupération des notes pour \"{publisher.name}\"...", indent=2)
+        utils.echoInfo(f"Récupération des notes pour \"{publisher.name}\"...", indent=2)
 
         old_length: int = len(note_list)
 
@@ -64,19 +64,33 @@ def getNotes(
                 data: dict[str, typing.Any] = r_notes.json()
                 matches: list[dict[str, typing.Any]] = data.get("results", [])
 
-                echo.echoInfo(f"Page {i}: {len(matches)} résultats", indent=3)
+                utils.echoInfo(f"Page {i}: {len(matches)} résultats", indent=3)
 
                 if len(matches) == 0:
                     break
 
                 for match in matches:
+                    name: str | None = utils.extractValueFromDict(match, 'name', None, str)
+                    slug: str | None = utils.extractValueFromDict(match, 'slug', None, str)
+                    release_date: datetime.date | None = utils.extractValueFromDict(match, 'released', None, datetime.date)
+                    tba: bool | None = utils.extractValueFromDict(match, 'tba', None, bool)
+                    metacritic: int | None = utils.extractValueFromDict(match, 'metacritic', None, int)
+                    rating: float | None = utils.extractValueFromDict(match, 'rating', None, float)
+                    ratings_count: int | None = utils.extractValueFromDict(match, 'ratings_count', None, int)
+                    suggestions_count: int | None = utils.extractValueFromDict(match, 'suggestions_count', None, int)
+                    reviews_count: int | None = utils.extractValueFromDict(match, 'reviews_count', None, int)
+
                     note_list.append(models.Note(
-                        name=str(match.get('name', '') or ''),
                         publisher=publisher.name,
-                        release_date=datetime.datetime.strptime(str(match.get('released', '1970-01-01') or '1970-01-01'), "%Y-%m-%d").date(),
-                        metacritic=int(match.get('metacritic', 0) or 0),
-                        rating=float(match.get('rating', 0.0) or 0.0),
-                        ratings_count=int(match.get('ratings_count', 0) or 0),
+                        name=name,
+                        slug=slug,
+                        release_date=release_date,
+                        tba=tba,
+                        metacritic=metacritic,
+                        rating=rating,
+                        ratings_count=ratings_count,
+                        suggestions_count=suggestions_count,
+                        reviews_count=reviews_count,
                         data_source=r_notes.url,
                     ))
 
@@ -86,11 +100,11 @@ def getNotes(
                 i += 1
 
             except Exception as e:
-                echo.echoError(f"Page {i}: {e}", indent=3)
+                utils.echoError(f"Page {i}: {e}", indent=3)
                 break
 
-        echo.echoInfo(f"Total des notes trouvés pour \"{publisher.name}\": {len(note_list) - old_length}", indent=2)
+        utils.echoInfo(f"Total des notes trouvés pour \"{publisher.name}\": {len(note_list) - old_length}", indent=2)
 
-    echo.echoInfo("--- Fin de la récupération des notes sur RAWG.io ---", indent=1)
+    utils.echoInfo("--- Fin de la récupération des notes sur RAWG.io ---", indent=1)
 
     return note_list

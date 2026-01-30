@@ -12,7 +12,7 @@ Functions
 """
 
 
-from .. import echo, models  # type: ignore # noqa: F401
+from .. import utils, models  # type: ignore # noqa: F401
 from .steam import getGames  # type: ignore # noqa: F401
 from .rawg import getNotes  # type: ignore # noqa: F401
 from .yfinance import getPublishers  # type: ignore # noqa: F401

@@ -6,3 +6,4 @@
 !main.py
 !src/
 !src/**
+**/__pycache__/**/*

@@ -100,29 +100,56 @@ class Data:
         """
         target_stock_value = self.publisher.history[target_date]
         release_stock_value = self.publisher.history[release_date]
+        current_time: str = datetime.datetime.now().isoformat()
 
         return {
             "date": target_date.isoformat(),
-            "currency": self.publisher.currency,
             "close_price": target_stock_value.close_price,
             "volume": target_stock_value.volume,
             "price_variation_percentage": round((target_stock_value.close_price - release_stock_value.close_price) * 100 / release_stock_value.close_price, 2),
             "volume_variation_percentage": round((target_stock_value.volume - release_stock_value.volume) * 100 / release_stock_value.volume, 2),
             "data_source": "yfinance python package (https://finance.yahoo.com/)",
+            "last_updated": current_time,
+            "ingestion_date": current_time,
         }
 
-    def __getStockData(self: typing.Self, /) -> dict[str, typing.Any]:
+    def __getStockData(self: typing.Self, current_time: str, /) -> dict[str, typing.Any]:
         """
         Calculate stock data before, at, and after game release.
+
+        Parameters:
+            current_time (str): Programm start timestamp in ISO format
 
         Returns:
             out (dict[str, typing.Any]): Stock infos and price values
         """
         result: dict[str, typing.Any] = {
             "publisher": self.publisher.long_name,
+            "country": self.publisher.country,
+            "full_time_employees": self.publisher.fullTimeEmployees,
+            "all_time_high": self.publisher.all_time_high,
+            "all_time_low": self.publisher.all_time_low,
+            "total_cash": self.publisher.total_cash,
+            "total_debt": self.publisher.total_debt,
+            "total_revenue": self.publisher.total_revenue,
             "ticker": self.publisher.symbol,
+            "currency": self.publisher.currency,
+            "market": self.publisher.market,
             "data_source": "yfinance python package (https://finance.yahoo.com/)",
+            "last_updated": current_time,
+            "ingestion_date": current_time,
         }
+
+        if self.game.release_date is None:
+            return result | {
+                "at_release": None,
+                "month_before": None,
+                "week_before": None,
+                "day_before": None,
+                "day_after": None,
+                "week_after": None,
+                "month_after": None,
+            }
 
         # Find closest dates with stock data
         at_release: datetime.date | None = self.__getNearestDateWithStockData(target=self.game.release_date, before=True)
@@ -179,32 +206,35 @@ class Data:
 
         return result
 
-    def toDict(self: typing.Self, /) -> dict[str, typing.Any]:
+    def toDict(self: typing.Self, current_time: str, /) -> dict[str, typing.Any]:
         """
         Convert Data object to dictionary matching the schema.
+
+        Parameters:
+            current_time (str): Programm start timestamp in ISO format
 
         Returns:
             out (dict[str, typing.Any]): Dictionary representation of the data
         """
-        current_time: str = datetime.datetime.now().isoformat()
-
-        data_dict: dict[str, typing.Any] = {
+        return {
             "name": self.game.name,
             "price": self.game.price,
-            "currency": self.game.currency,
+            "price_currency": self.game.currency,
             "for_windows": self.game.for_windows,
             "for_linux": self.game.for_linux,
             "for_mac": self.game.for_mac,
-            "release_date": self.game.release_date.isoformat(),
+            "release_date": self.game.release_date.isoformat() if self.game.release_date else None,
+            "to_be_announced": self.note.tba if self.note else None,
             "genres": self.game.genres,
+            "recommendations_count": self.game.recommendations_count,
             "metacritic": self.note.metacritic if self.note else None,
             "rating": self.note.rating if self.note else None,
             "ratings_count": self.note.ratings_count if self.note else None,
-            "stocks": self.__getStockData(),
+            "suggestions_count": self.note.suggestions_count if self.note else None,
+            "reviews_count": self.note.reviews_count if self.note else None,
+            "stocks": self.__getStockData(current_time),
             "data_source_game": self.game.data_source,
             "data_source_note": self.note.data_source if self.note else None,
             "last_updated": current_time,
             "ingestion_date": current_time,
         }
-
-        return data_dict

@@ -15,11 +15,14 @@ Functions
 - `echoInfo`
 - `echoWarning`
 - `echoError`
+- `extractValueFromDict`
 """
 
 
 import os
 import sys
+import typing
+import datetime
 import enum
 import textwrap
 import rich
@@ -165,3 +168,52 @@ def echoError(
         flush (bool) : Whether to forcibly flush the stream
     """
     __echo(LogType.ERROR, indent, message, end=end, flush=flush)
+
+
+def extractValueFromDict(
+        data: dict[str, typing.Any],
+        key: str,
+        default: typing.Any,
+        wished_type: typing.Type[typing.Any],
+        /,
+        *,
+        date_format: str = "%Y-%m-%d",
+        list_mapping_func: typing.Callable[[typing.Any], typing.Any] = lambda x: x,
+        ) -> typing.Any:
+    """
+    Safely extracts a value from a dictionary, returning a default if the key is not found.
+
+    Parameters:
+        data (dict[str, typing.Any]): The dictionary to extract the value from
+        key (str): The key whose value is to be extracted
+        default (typing.Any): The default value to return if the key is not found
+        wished_type (typing.Type[typing.Any]): The expected type of the value
+        date_format (str): The date format to use when extracting date values (default: "%Y-%m-%d")
+
+    Returns:
+        out (typing.Any): The extracted value or the default value
+    """
+    value = data.get(key, default)
+
+    if isinstance(value, wished_type) and wished_type != list:
+        return value
+
+    if wished_type == datetime.date:
+        try:
+            if isinstance(value, str):
+                return datetime.datetime.strptime(value, date_format).date()
+            else:
+                return default
+        except Exception:
+            return default
+
+    if wished_type == list:
+        try:
+            return list(map(list_mapping_func, value))
+        except Exception:
+            return default
+
+    try:
+        return wished_type(value)
+    except Exception:
+        return default
